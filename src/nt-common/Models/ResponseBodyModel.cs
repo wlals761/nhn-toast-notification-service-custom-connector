@@ -1,6 +1,6 @@
-using Newtonsoft.Json;
 using System.Collections.Generic;
 
+using Newtonsoft.Json;
 
 namespace Toast.Common.Models
 {
@@ -12,7 +12,6 @@ namespace Toast.Common.Models
         /// <summary>
         /// Gets or sets the data.
         /// </summary>
-        [JsonProperty("data")]
         public virtual T Data { get; set; }
     }
 
@@ -30,20 +29,16 @@ namespace Toast.Common.Models
         /// <summary>
         /// Gets or sets the page size.
         /// </summary>
-        [JsonProperty("pageSize")]
         public virtual int PageSize { get; set; }
 
         /// <summary>
         /// Gets or sets the total count.
         /// </summary>
-        [JsonProperty("totalCount")]
         public virtual int TotalCount { get; set; }
 
         /// <summary>
         /// Gets or sets the list of data.
         /// </summary>
-        [JsonProperty("data")]
         public virtual List<T> Data { get; set; }
     }
-
 }
