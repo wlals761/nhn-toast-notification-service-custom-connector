@@ -65,14 +65,21 @@ do
 
     appsettings_updated=$(az functionapp config appsettings set -g $resource_group -n $fncapp_name --settings OpenApi__HostNames=$openapi_hostnames)
 
+    # Update OpenAPI document version
+    filename=$(echo ${api_zip##*/})
+    version_extension=$(echo ${filename##*-})
+    openapi_docversion=$(echo ${version_extension%.*})
+
+    appsettings_updated=$(az functionapp config appsettings set -g $resource_group -n $fncapp_name --settings OpenApi__DocVersion=$openapi_docversion)
+
     # Update NHN Toast endpoints on function apps
-    appsettings=$(curl https://raw.githubusercontent.com/devrel-kr/nhn-toast-notification-service-custom-connector/main/infra/appsettings-endpoints-${fncapp_suffixes[$value]}.json)
+    appsettings=$(curl https://raw.githubusercontent.com/devrel-kr/nhn-toast-notification-service-custom-connector/main/infra/appsettings-${fncapp_suffixes[$value]}.json)
     appsettings_length=$(echo $appsettings | jq '. | length')
     for (( i=0; i<$appsettings_length; i++ ))
     do
         appsettings_name=$(echo $appsettings | jq --arg i "$i" '.[$i|fromjson].name' -r)
         appsettings_value=$(echo $appsettings | jq --arg i "$i" '.[$i|fromjson].value' -r)
 
-        appsettings_updated=$(az functionapp config appsettings set -g $resource_group -n $fncapp_name --settings $appsettings_name=$appsettings_value)
+        appsettings_updated=$(az functionapp config appsettings set -g $resource_group -n $fncapp_name --settings $appsettings_name="$appsettings_value")
     done
 done
