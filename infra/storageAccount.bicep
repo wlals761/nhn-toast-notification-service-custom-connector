@@ -1,17 +1,6 @@
 param name string
 param suffix string = ''
 param location string = resourceGroup().location
-
-@allowed([
-    'dev'
-    'test'
-    'prod'
-
-    'kdy'
-    'kms'
-    'lsw'
-    'pjm'
-])
 param env string = 'dev'
 
 @allowed([
@@ -26,6 +15,11 @@ param env string = 'dev'
 ])
 param storageAccountSku string = 'Standard_LRS'
 
+// Array item should be in the form of:
+// {
+//     name: '<container_name>'
+//     publicAccess: '<None|Blob|Container>'
+// }
 param storageAccountBlobContainers array = []
 param storageAccountTables array = []
 
@@ -140,18 +134,39 @@ resource stblob 'Microsoft.Storage/storageAccounts/blobServices@2021-06-01' = if
         deleteRetentionPolicy: {
             enabled: false
         }
+        cors: {
+            corsRules: [
+                {
+                    allowedOrigins: [
+                        'https://flow.microsoft.com'
+                        'https://asia.flow.microsoft.com'
+                        'https://korea.flow.microsoft.com'
+                    ]
+                    allowedMethods: [
+                        'GET'
+                    ]
+                    allowedHeaders: [
+                        '*'
+                    ]
+                    exposedHeaders: [
+                        '*'
+                    ]
+                    maxAgeInSeconds: 0
+                }
+            ]
+        }
     }
 }
 
 resource stblobcontainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2021-06-01' = [for container in storage.blob.containers: if (length(storage.blob.containers) > 0) {
-    name: '${stblob.name}/${container}'
+    name: '${stblob.name}/${container.name}'
     properties: {
         immutableStorageWithVersioning: {
             enabled: false
         }
         defaultEncryptionScope: '$account-encryption-key'
         denyEncryptionScopeOverride: false
-        publicAccess: 'None'
+        publicAccess: container.publicAccess
     }
 }]
 

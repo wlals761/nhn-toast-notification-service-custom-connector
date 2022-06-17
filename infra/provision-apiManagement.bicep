@@ -1,16 +1,6 @@
 param name string
 param suffix string = ''
 param location string = resourceGroup().location
-@allowed([
-    'dev'
-    'test'
-    'prod'
-
-    'kdy'
-    'kms'
-    'lsw'
-    'pjm'
-])
 param env string = 'dev'
 
 // Storage
@@ -25,7 +15,21 @@ param env string = 'dev'
     'Premium_ZRS'
 ])
 param storageAccountSku string = 'Standard_LRS'
-param storageAccountBlobContainers array = []
+// Array item should be in the form of:
+// {
+//     name: '<container_name>'
+//     publicAccess: '<None|Blob|Container>'
+// }
+param storageAccountBlobContainers array = [
+    {
+        name: 'swaggers'
+        publicAccess: 'Blob'
+    }
+    {
+        name: 'openapis'
+        publicAccess: 'Blob'
+    }
+]
 param storageAccountTables array = []
 
 // Log Analytics Workspace
